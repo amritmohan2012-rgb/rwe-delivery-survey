@@ -105,6 +105,7 @@ function ansText(q,a){
 const ROLE=window.ROLE==='admin'?'admin':'form';
 const ALLOWED=ROLE==='admin'?['tracker','results']:['form'];
 let fdb=null,fauth=null,FV=null;
+const DEFAULT_CALLERS=["Pooja","Yogita","Manju","Suman","Anupriya","Anisha","Anisha Verma"];
 const S={tab:ALLOWED[0],mode:'rwe',caller:ls.get('rwe-caller')||'',team:(()=>{try{return JSON.parse(ls.get('dds-team'))||[]}catch(e){return []}})(),calls:[],gotCalls:false,conn:'connecting',user:'',err:'',sel:null,draft:null,
   q:{state:'',dist:'',mat:'',cat:'',shop:'',st:'todo',s:'',n:40},
   F:{state:'',dist:'',type:'',by:'',o:'',s:''},tpage:0,
@@ -190,7 +191,7 @@ function applyRole(){
 /* ---------- caller selector ---------- */
 function renderWho(){
   const sel=$('#who');
-  const names=[...new Set([...S.team,...S.calls.map(c=>c.by).filter(Boolean),...(S.caller?[S.caller]:[])])].sort((a,b)=>a.localeCompare(b));
+  const names=[...new Set([...DEFAULT_CALLERS,...S.team,...S.calls.map(c=>c.by).filter(Boolean),...(S.caller?[S.caller]:[])])].sort((a,b)=>a.localeCompare(b));
   sel.innerHTML=`<option value="">Select your name</option>`+names.map(n=>`<option>${esc(n)}</option>`).join('')+`<option value="__new">+ Add my name…</option>`;
   sel.value=S.caller||'';
 }
