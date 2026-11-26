@@ -1,0 +1,32 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---- RWE Delivery Survey: add everything below to your existing rules ----
+
+    function signedIn() { return request.auth != null; }
+
+    // Team leads who may read the calls. Replace with the real Google accounts.
+    function isLead() {
+      return signedIn()
+        && request.auth.token.email_verified == true
+        && request.auth.token.email in ['amrit.mohan@frontiermkts.com', 'girija.kumawat@frontiermkts.com'];
+    }
+
+    // One document per call. Callers can add calls but cannot read, change or delete them.
+    match /dds_calls/{callId} {
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['kind','d','id','c','m','vil','blk','nm','ph','by','byId','t','o','cb','rem','cons','a'])
+        && request.resource.data.kind in ['rwe', 'hh']
+        && request.resource.data.o in ['done', 'partial', 'noans', 'off', 'wrong', 'declined']
+        && request.resource.data.by is string && request.resource.data.by.size() < 60;
+      allow read: if isLead();
+      allow update, delete: if false;
+    }
+
+    // Small status documents (who was called, outcome, count). No answers are stored here.
+    match /dds_status/{docId} {
+      allow read, write: if signedIn();
+    }
+  }
+}
